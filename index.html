@@ -4,27 +4,203 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMPATHY AI</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f4f7fb;
+padding:30px;
+}
+
+.container{
+max-width:800px;
+margin:auto;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 0 15px rgba(0,0,0,.1);
+}
+
+h1{
+color:#2563eb;
+}
+
+select,textarea{
+width:100%;
+padding:12px;
+margin-top:8px;
+margin-bottom:15px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:15px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;
+}
+
+.result{
+margin-top:20px;
+padding:20px;
+background:#eef4ff;
+border-radius:10px;
+display:none;
+}
+</style>
 </head>
+
 <body>
 
-<h1>EMPATHY AI</h1>
+<div class="container">
+
+<h1>❤️ EMPATHY AI</h1>
 
 <p>Prima di inviare, capisci come sarà ricevuto.</p>
 
-<input id="message" placeholder="Scrivi un messaggio">
+<label>Destinatario</label>
+
+<select id="target">
+<option>Partner</option>
+<option>Mamma</option>
+<option>Papà</option>
+<option>Capo</option>
+<option>Amico</option>
+</select>
+
+<label>Messaggio</label>
+
+<textarea id="message"
+placeholder="Scrivi qui il tuo messaggio"></textarea>
 
 <button onclick="analyzeMessage()">
 Analizza
 </button>
 
-<p id="output"></p>
+<div id="result" class="result">
+
+<h3>Come verrà percepito</h3>
+<p id="perception"></p>
+
+<h3>Emozione trasmessa</h3>
+<p id="emotion"></p>
+
+<h3>Bisogno nascosto</h3>
+<p id="need"></p>
+
+<h3>Versione consigliata</h3>
+<p id="suggestion"></p>
+
+</div>
+
+</div>
 
 <script>
-function analyzeMessage() {
-const msg = document.getElementById("message").value;
-document.getElementById("output").innerHTML =
-"Hai scritto: " + msg;
+
+function analyzeMessage(){
+
+let msg =
+document.getElementById("message")
+.value.toLowerCase();
+
+let perception =
+"Osservazione neutra";
+
+let emotion =
+"Neutra";
+
+let need =
+"Comunicare in modo chiaro";
+
+let suggestion =
+"Il messaggio appare già abbastanza chiaro.";
+
+
+if(msg.includes("sempre") ||
+msg.includes("mai")){
+
+perception =
+"Accusa";
+
+emotion =
+"Frustrazione";
+
+need =
+"Sentirmi rispettato e ascoltato";
+
+suggestion =
+"Quando accade questo mi sento frustrato. Possiamo parlarne insieme?";
 }
+
+
+if(msg.includes("ritardo")){
+
+perception =
+"Critica";
+
+emotion =
+"Fastidio";
+
+need =
+"Rispetto reciproco";
+
+suggestion =
+"Quando arrivi in ritardo mi sento frustrato perché la puntualità è importante per me. Possiamo organizzarci meglio?";
+}
+
+
+if(msg.includes("non mi ascolti")){
+
+perception =
+"Accusa";
+
+emotion =
+"Delusione";
+
+need =
+"Sentirmi ascoltato";
+
+suggestion =
+"Quando parliamo e non ricevo attenzione mi sento poco ascoltato. Possiamo confrontarci con calma?";
+}
+
+if(msg.includes("fai quello che vuoi")){
+
+perception =
+"Chiusura della comunicazione";
+
+emotion =
+"Rassegnazione";
+
+need =
+"Essere considerato";
+
+suggestion =
+"In questo momento sono deluso dalla situazione. Mi piacerebbe trovare una soluzione insieme.";
+}
+
+document.getElementById("perception").innerHTML =
+perception;
+
+document.getElementById("emotion").innerHTML =
+emotion;
+
+document.getElementById("need").innerHTML =
+need;
+
+document.getElementById("suggestion").innerHTML =
+suggestion;
+
+document.getElementById("result").style.display =
+"block";
+
+}
+
 </script>
 
 </body>
