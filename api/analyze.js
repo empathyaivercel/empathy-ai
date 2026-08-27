@@ -1,15 +1,16 @@
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
-    res.status(405).json({ error: "Metodo non consentito" });
-    return;
+    return res.status(405).json({
+      error: "Metodo non consentito"
+    });
   }
 
   try {
 
     const { target, message } = req.body;
 
-    const openAiResponse = await fetch(
+    const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
       {
         method: "POST",
@@ -20,48 +21,65 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: "gpt-4o-mini",
           temperature: 0.7,
+          response_format: {
+            type: "json_object"
+          },
           messages: [
             {
               role: "system",
               content: `
-Sei un consulente esperto di comunicazione relazionale.
+Sei EMPATHY AI.
 
-Analizza il messaggio e restituisci SOLO un JSON valido:
+Sei un esperto mondiale di:
 
-{
-  "perception":"",
-  "emotion":"",
-  "need":"",
-  "suggestion":""
-}
-`
-            },
-            {
-              role: "user",
-              content: `
-Destinatario: ${target}
+- comunicazione relazionale
+- intelligenza emotiva
+- comunicazione non violenta
+- gestione dei conflitti
+- relazioni di coppia
+- comunicazione professionale
 
-Messaggio:
-${message}
-`
-            }
-          ]
-        })
-      }
-    );
+Analizza il messaggio considerando il destinatario.
 
-    const data = await openAiResponse.json();
+Valuta:
 
-    res.status(200).json({
-      result: data.choices[0].message.content
-    });
+1. perception
+Come il destinatario potrebbe percepire il messaggio
 
-  } catch (error) {
+Esempi:
+- Accusa
+- Critica
+- Richiesta di aiuto
+- Chiusura della comunicazione
+- Vulnerabilità
+- Condivisione emotiva
+- Pressione
 
-    res.status(500).json({
-      error: error.message
-    });
+2. emotion
+Emozione predominante trasmessa.
 
-  }
+3. need
+Bisogno nascosto dietro al messaggio.
 
-}
+4. suggestion
+Riscrittura empatica, chiara e collaborativa.
+
+5. conflictScore
+Da 0 a 100.
+
+0 = nessun rischio conflitto
+100 = altissimo rischio conflitto
+
+6. empathyScore
+
+Da 0 a 100.
+
+0 = messaggio poco empatico
+100 = molto empatico
+
+7. defensivenessScore
+
+Da 0 a 100.
+
+0 = bassa probabilità di risposta difensiva
+100 =
