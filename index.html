@@ -18,7 +18,7 @@ body{
 }
 
 .container{
-    max-width:900px;
+    max-width:1000px;
     margin:auto;
     background:white;
     padding:30px;
@@ -28,6 +28,7 @@ body{
 
 h1{
     color:#2563eb;
+    margin-bottom:10px;
 }
 
 .subtitle{
@@ -55,25 +56,37 @@ textarea{
     min-height:140px;
 }
 
-button{
+.button{
     width:100%;
     padding:14px;
-    margin-top:20px;
-    font-size:16px;
+    margin-top:15px;
     border:none;
     border-radius:8px;
-    background:#2563eb;
-    color:white;
+    font-size:16px;
     cursor:pointer;
 }
 
-button:hover{
+.primary{
+    background:#2563eb;
+    color:white;
+}
+
+.primary:hover{
     background:#1d4ed8;
+}
+
+.success{
+    background:#16a34a;
+    color:white;
+}
+
+.success:hover{
+    background:#15803d;
 }
 
 .result{
     margin-top:25px;
-    padding:20px;
+    padding:25px;
     background:#eef4ff;
     border-radius:12px;
     display:none;
@@ -85,17 +98,29 @@ button:hover{
     color:#2563eb;
 }
 
-ul{
-    padding-left:20px;
+.section{
+    margin-bottom:20px;
 }
 
-li{
-    margin-bottom:6px;
+.compare-box{
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:10px;
+    border-left:4px solid #2563eb;
 }
 
 .loading{
     color:#2563eb;
     font-weight:bold;
+}
+
+ul{
+    padding-left:20px;
+}
+
+li{
+    margin-bottom:5px;
 }
 
 </style>
@@ -129,35 +154,81 @@ Prima di inviare, capisci come sarà ricevuto.
     placeholder="Scrivi qui il tuo messaggio..."
 ></textarea>
 
-<button onclick="analyzeMessage()">
+<button
+    class="button primary"
+    onclick="analyzeMessage()">
     Analizza
+</button>
+
+<button
+    class="button success"
+    onclick="applySuggestion()">
+    Migliora il messaggio
 </button>
 
 <div id="result" class="result">
 
-    <h3>Come verrà percepito</h3>
-    <p id="perception"></p>
+<div class="section">
+<h3>Cosa potrebbe sentire il destinatario</h3>
+<p id="perception"></p>
+</div>
 
-    <h3>Emozione trasmessa</h3>
-    <p id="emotion"></p>
+<div class="section">
+<h3>Emozione trasmessa</h3>
+<p id="emotion"></p>
+</div>
 
-    <h3>Bisogno nascosto</h3>
-    <p id="need"></p>
+<div class="section">
+<h3>Cosa stai cercando di comunicare davvero</h3>
+<p id="need"></p>
+</div>
 
-    <h3>Versione consigliata</h3>
-    <p id="suggestion"></p>
+<div class="section">
+<h3>Come potrebbe rispondere il destinatario</h3>
+<p id="likelyReaction"></p>
+</div>
 
-    <h3>Rischio conflitto</h3>
-    <p id="conflictScore" class="score"></p>
+<div class="section">
+<h3>Versione consigliata</h3>
+<p id="suggestion"></p>
+</div>
 
-    <h3>Livello empatia</h3>
-    <p id="empathyScore" class="score"></p>
+<div class="section">
 
-    <h3>Probabilità risposta difensiva</h3>
-    <p id="defensivenessScore" class="score"></p>
+<h3>Confronto Prima / Dopo</h3>
 
-    <h3>Elementi critici rilevati</h3>
-    <ul id="redFlags"></ul>
+<div class="compare-box">
+<strong>Messaggio originale</strong>
+<p id="originalMessage"></p>
+</div>
+
+<div class="compare-box">
+<strong>Messaggio migliorato</strong>
+<p id="improvedMessage"></p>
+</div>
+
+</div>
+
+<div class="section">
+
+<h3>Rischio conflitto</h3>
+<p id="conflictScore" class="score"></p>
+
+<h3>Livello empatia</h3>
+<p id="empathyScore" class="score"></p>
+
+<h3>Probabilità risposta difensiva</h3>
+<p id="defensivenessScore" class="score"></p>
+
+</div>
+
+<div class="section">
+
+<h3>Elementi critici rilevati</h3>
+
+<ul id="redFlags"></ul>
+
+</div>
 
 </div>
 
@@ -183,17 +254,12 @@ async function analyzeMessage(){
     document.getElementById("result")
         .style.display = "block";
 
+    document.getElementById("originalMessage")
+        .innerHTML = message;
+
     document.getElementById("perception")
         .innerHTML =
         "<span class='loading'>Analisi in corso...</span>";
-
-    document.getElementById("emotion").innerHTML = "";
-    document.getElementById("need").innerHTML = "";
-    document.getElementById("suggestion").innerHTML = "";
-    document.getElementById("conflictScore").innerHTML = "";
-    document.getElementById("empathyScore").innerHTML = "";
-    document.getElementById("defensivenessScore").innerHTML = "";
-    document.getElementById("redFlags").innerHTML = "";
 
     try{
 
@@ -216,7 +282,7 @@ async function analyzeMessage(){
         if(!data.result){
 
             throw new Error(
-                data.error || "Nessuna risposta dall'AI"
+                data.error || "Nessuna risposta AI"
             );
         }
 
@@ -239,6 +305,14 @@ async function analyzeMessage(){
             .innerHTML =
             aiResult.suggestion || "-";
 
+        document.getElementById("improvedMessage")
+            .innerHTML =
+            aiResult.suggestion || "-";
+
+        document.getElementById("likelyReaction")
+            .innerHTML =
+            aiResult.likelyReaction || "-";
+
         document.getElementById("conflictScore")
             .innerHTML =
             (aiResult.conflictScore ?? 0) + "/100";
@@ -251,10 +325,10 @@ async function analyzeMessage(){
             .innerHTML =
             (aiResult.defensivenessScore ?? 0) + "/100";
 
-        const redFlagsContainer =
+        const redFlags =
             document.getElementById("redFlags");
 
-        redFlagsContainer.innerHTML = "";
+        redFlags.innerHTML = "";
 
         if(
             aiResult.redFlags &&
@@ -268,7 +342,7 @@ async function analyzeMessage(){
 
                 li.textContent = flag;
 
-                redFlagsContainer.appendChild(li);
+                redFlags.appendChild(li);
 
             });
 
@@ -280,7 +354,7 @@ async function analyzeMessage(){
             li.textContent =
                 "Nessun elemento critico rilevato";
 
-            redFlagsContainer.appendChild(li);
+            redFlags.appendChild(li);
 
         }
 
@@ -291,35 +365,4 @@ async function analyzeMessage(){
 
         document.getElementById("perception")
             .innerHTML =
-            "Errore durante l'analisi";
-
-        document.getElementById("emotion")
-            .innerHTML = "-";
-
-        document.getElementById("need")
-            .innerHTML = "-";
-
-        document.getElementById("suggestion")
-            .innerHTML = "-";
-
-        document.getElementById("conflictScore")
-            .innerHTML = "-";
-
-        document.getElementById("empathyScore")
-            .innerHTML = "-";
-
-        document.getElementById("defensivenessScore")
-            .innerHTML = "-";
-
-        document.getElementById("redFlags")
-            .innerHTML =
-            "<li>Errore durante l'analisi</li>";
-
-    }
-
-}
-
-</script>
-
-</body>
-</html>
+            "Errore
