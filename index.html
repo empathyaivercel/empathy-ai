@@ -1,61 +1,325 @@
-# ❤️ EMPATHY AI
+<!DOCTYPE html>
+<html lang="it">
 
-## Prima di inviare, capisci come sarà ricevuto.
+<head>
 
-EMPATHY AI è una web app che utilizza l'intelligenza artificiale per aiutare le persone a comunicare in modo più efficace.
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-L'obiettivo è ridurre incomprensioni, conflitti e risposte difensive analizzando il messaggio prima dell'invio.
+<title>❤️ EMPATHY AI</title>
 
----
+<style>
 
-## Problema
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f7fb;
+    margin:0;
+    padding:30px;
+}
 
-Spesso le persone si concentrano su ciò che vogliono dire.
+.container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,.1);
+}
 
-Molto più raramente si chiedono:
+h1{
+    color:#2563eb;
+}
 
-> Come verrà percepito il mio messaggio?
+.subtitle{
+    color:#666;
+    margin-bottom:25px;
+}
 
-Le incomprensioni nascono spesso dalla differenza tra:
+label{
+    display:block;
+    margin-top:15px;
+    margin-bottom:8px;
+    font-weight:bold;
+}
 
-- intenzione del mittente
-- percezione del destinatario
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+}
 
-EMPATHY AI aiuta a colmare questa distanza.
+textarea{
+    min-height:140px;
+}
 
----
+button{
+    width:100%;
+    padding:14px;
+    margin-top:20px;
+    font-size:16px;
+    border:none;
+    border-radius:8px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+}
 
-## Come funziona
+button:hover{
+    background:#1d4ed8;
+}
 
-L'utente:
+.result{
+    margin-top:25px;
+    padding:20px;
+    background:#eef4ff;
+    border-radius:12px;
+    display:none;
+}
 
-1. Seleziona il destinatario
-2. Scrive un messaggio
-3. Clicca "Analizza"
+.score{
+    font-size:22px;
+    font-weight:bold;
+    color:#2563eb;
+}
 
-L'AI restituisce:
+ul{
+    padding-left:20px;
+}
 
-- Come verrà percepito
-- Emozione trasmessa
-- Bisogno nascosto
-- Versione consigliata
-- Rischio conflitto
-- Livello empatia
-- Probabilità risposta difensiva
-- Elementi critici rilevati
+li{
+    margin-bottom:6px;
+}
 
----
+.loading{
+    color:#2563eb;
+    font-weight:bold;
+}
 
-## Destinatari disponibili
+</style>
 
-- ❤️ Partner
-- 👩 Mamma
-- 👨 Papà
-- 👔 Capo
-- 👥 Amico
+</head>
 
----
+<body>
 
-## Esempio
+<div class="container">
 
-### Input
+<h1>❤️ EMPATHY AI</h1>
+
+<p class="subtitle">
+Prima di inviare, capisci come sarà ricevuto.
+</p>
+
+<label>Destinatario</label>
+
+<select id="target">
+    <option>Partner</option>
+    <option>Mamma</option>
+    <option>Papà</option>
+    <option>Capo</option>
+    <option>Amico</option>
+</select>
+
+<label>Messaggio</label>
+
+<textarea
+    id="message"
+    placeholder="Scrivi qui il tuo messaggio..."
+></textarea>
+
+<button onclick="analyzeMessage()">
+    Analizza
+</button>
+
+<div id="result" class="result">
+
+    <h3>Come verrà percepito</h3>
+    <p id="perception"></p>
+
+    <h3>Emozione trasmessa</h3>
+    <p id="emotion"></p>
+
+    <h3>Bisogno nascosto</h3>
+    <p id="need"></p>
+
+    <h3>Versione consigliata</h3>
+    <p id="suggestion"></p>
+
+    <h3>Rischio conflitto</h3>
+    <p id="conflictScore" class="score"></p>
+
+    <h3>Livello empatia</h3>
+    <p id="empathyScore" class="score"></p>
+
+    <h3>Probabilità risposta difensiva</h3>
+    <p id="defensivenessScore" class="score"></p>
+
+    <h3>Elementi critici rilevati</h3>
+    <ul id="redFlags"></ul>
+
+</div>
+
+</div>
+
+<script>
+
+async function analyzeMessage(){
+
+    const target =
+        document.getElementById("target").value;
+
+    const message =
+        document.getElementById("message").value;
+
+    if(message.trim() === ""){
+
+        alert("Inserisci un messaggio");
+
+        return;
+    }
+
+    document.getElementById("result")
+        .style.display = "block";
+
+    document.getElementById("perception")
+        .innerHTML =
+        "<span class='loading'>Analisi in corso...</span>";
+
+    document.getElementById("emotion").innerHTML = "";
+    document.getElementById("need").innerHTML = "";
+    document.getElementById("suggestion").innerHTML = "";
+    document.getElementById("conflictScore").innerHTML = "";
+    document.getElementById("empathyScore").innerHTML = "";
+    document.getElementById("defensivenessScore").innerHTML = "";
+    document.getElementById("redFlags").innerHTML = "";
+
+    try{
+
+        const response = await fetch(
+            "/api/analyze",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    target,
+                    message
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if(!data.result){
+
+            throw new Error(
+                data.error || "Nessuna risposta dall'AI"
+            );
+        }
+
+        const aiResult =
+            JSON.parse(data.result);
+
+        document.getElementById("perception")
+            .innerHTML =
+            aiResult.perception || "-";
+
+        document.getElementById("emotion")
+            .innerHTML =
+            aiResult.emotion || "-";
+
+        document.getElementById("need")
+            .innerHTML =
+            aiResult.need || "-";
+
+        document.getElementById("suggestion")
+            .innerHTML =
+            aiResult.suggestion || "-";
+
+        document.getElementById("conflictScore")
+            .innerHTML =
+            (aiResult.conflictScore ?? 0) + "/100";
+
+        document.getElementById("empathyScore")
+            .innerHTML =
+            (aiResult.empathyScore ?? 0) + "/100";
+
+        document.getElementById("defensivenessScore")
+            .innerHTML =
+            (aiResult.defensivenessScore ?? 0) + "/100";
+
+        const redFlagsContainer =
+            document.getElementById("redFlags");
+
+        redFlagsContainer.innerHTML = "";
+
+        if(
+            aiResult.redFlags &&
+            aiResult.redFlags.length > 0
+        ){
+
+            aiResult.redFlags.forEach(flag => {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent = flag;
+
+                redFlagsContainer.appendChild(li);
+
+            });
+
+        } else {
+
+            const li =
+                document.createElement("li");
+
+            li.textContent =
+                "Nessun elemento critico rilevato";
+
+            redFlagsContainer.appendChild(li);
+
+        }
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        document.getElementById("perception")
+            .innerHTML =
+            "Errore durante l'analisi";
+
+        document.getElementById("emotion")
+            .innerHTML = "-";
+
+        document.getElementById("need")
+            .innerHTML = "-";
+
+        document.getElementById("suggestion")
+            .innerHTML = "-";
+
+        document.getElementById("conflictScore")
+            .innerHTML = "-";
+
+        document.getElementById("empathyScore")
+            .innerHTML = "-";
+
+        document.getElementById("defensivenessScore")
+            .innerHTML = "-";
+
+        document.getElementById("redFlags")
+            .innerHTML =
+            "<li>Errore durante l'analisi</li>";
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
