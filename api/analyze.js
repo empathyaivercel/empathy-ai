@@ -20,7 +20,6 @@ module.exports = async function (req, res) {
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
-          temperature: 0.7,
           response_format: {
             type: "json_object"
           },
@@ -30,66 +29,84 @@ module.exports = async function (req, res) {
               content: `
 Sei EMPATHY AI.
 
-Sei un esperto mondiale di:
+Analizza il messaggio considerando il destinatario.
 
-- comunicazione relazionale
-- intelligenza emotiva
-- relazioni di coppia
-- comunicazione familiare
-- comunicazione professionale
-- comunicazione non violenta
-- gestione dei conflitti
+Restituisci ESCLUSIVAMENTE un JSON valido nel formato:
 
-Analizza il messaggio dal punto di vista del destinatario.
+{
+  "perception":"",
+  "emotion":"",
+  "need":"",
+  "suggestion":"",
+  "conflictScore":0,
+  "empathyScore":0,
+  "defensivenessScore":0,
+  "redFlags":[]
+}
 
-Valuta i seguenti aspetti.
+Regole:
 
-perception
+- perception = come il destinatario potrebbe percepirlo
+- emotion = emozione principale
+- need = bisogno nascosto
+- suggestion = versione più empatica
 
-Come il destinatario potrebbe percepire il messaggio.
+Aumentano conflictScore e defensivenessScore:
 
-Possibili valori:
+- sempre
+- mai
+- accuse
+- critiche personali
+- sarcasmo
 
-- Accusa
-- Critica
-- Pressione
-- Chiusura della comunicazione
-- Richiesta di aiuto
-- Vulnerabilità
-- Condivisione sincera
-- Collaborazione
-- Frustrazione implicita
+Aumentano empathyScore:
 
-emotion
+- io mi sento
+- collaborazione
+- vulnerabilità
+- ascolto reciproco
 
-Emozione principale trasmessa dal messaggio.
+redFlags è una lista delle criticità individuate.
+`
+            },
+            {
+              role: "user",
+              content: `
+Destinatario: ${target}
 
-need
+Messaggio:
+${message}
+`
+            }
+          ]
+        })
+      }
+    );
 
-Bisogno emotivo nascosto dietro al messaggio.
+    const data = await response.json();
 
-suggestion
+    if (!data.choices || !data.choices[0]) {
 
-Riscrivi il messaggio usando comunicazione empatica e collaborativa.
+      console.error(data);
 
-conflictScore
+      return res.status(500).json({
+        error: "Risposta OpenAI non valida"
+      });
 
-Valore da 0 a 100.
+    }
 
-0 = nessun rischio conflitto
+    return res.status(200).json({
+      result: data.choices[0].message.content
+    });
 
-100 = conflitto quasi certo
+  } catch (error) {
 
-empathyScore
+    console.error(error);
 
-Valore da 0 a 100.
+    return res.status(500).json({
+      error: error.message
+    });
 
-0 = messaggio poco empatico
+  }
 
-100 = messaggio molto empatico
-
-defensivenessScore
-
-Valore da 0 a 100.
-
-0
+};
