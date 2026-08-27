@@ -96,4 +96,164 @@ button:hover{
     <option>Partner</option>
     <option>Mamma</option>
     <option>Papà</option>
-    <option
+    <option>Capo</option>
+    <option>Amico</option>
+</select>
+
+<label>Messaggio</label>
+
+<textarea
+    id="message"
+    placeholder="Scrivi qui il tuo messaggio">
+</textarea>
+
+<button onclick="analyzeMessage()">
+    Analizza
+</button>
+
+<div id="result" class="result">
+
+    <h3>Come verrà percepito</h3>
+    <p id="perception"></p>
+
+    <h3>Emozione trasmessa</h3>
+    <p id="emotion"></p>
+
+    <h3>Bisogno nascosto</h3>
+    <p id="need"></p>
+
+    <h3>Versione consigliata</h3>
+    <p id="suggestion"></p>
+
+    <h3>Rischio conflitto</h3>
+    <p id="conflictScore" class="score"></p>
+
+    <h3>Livello empatia</h3>
+    <p id="empathyScore" class="score"></p>
+
+    <h3>Probabilità risposta difensiva</h3>
+    <p id="defensivenessScore" class="score"></p>
+
+</div>
+
+</div>
+
+<script>
+
+async function analyzeMessage() {
+
+    const target =
+        document.getElementById("target").value;
+
+    const message =
+        document.getElementById("message").value;
+
+    if(message.trim() === ""){
+
+        alert("Inserisci un messaggio.");
+
+        return;
+    }
+
+    document.getElementById("result")
+        .style.display = "block";
+
+    document.getElementById("perception")
+        .innerHTML = "Analisi in corso...";
+
+    document.getElementById("emotion")
+        .innerHTML = "";
+
+    document.getElementById("need")
+        .innerHTML = "";
+
+    document.getElementById("suggestion")
+        .innerHTML = "";
+
+    document.getElementById("conflictScore")
+        .innerHTML = "";
+
+    document.getElementById("empathyScore")
+        .innerHTML = "";
+
+    document.getElementById("defensivenessScore")
+        .innerHTML = "";
+
+    try {
+
+        const response = await fetch(
+            "/api/analyze",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    target,
+                    message
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if(!data.result){
+            throw new Error("Nessuna risposta ricevuta");
+        }
+
+        const aiResult =
+            JSON.parse(data.result);
+
+        document.getElementById("perception")
+            .innerHTML =
+            aiResult.perception || "-";
+
+        document.getElementById("emotion")
+            .innerHTML =
+            aiResult.emotion || "-";
+
+        document.getElementById("need")
+            .innerHTML =
+            aiResult.need || "-";
+
+        document.getElementById("suggestion")
+            .innerHTML =
+            aiResult.suggestion || "-";
+
+        document.getElementById("conflictScore")
+            .innerHTML =
+            (aiResult.conflictScore ?? 0) + "/100";
+
+        document.getElementById("empathyScore")
+            .innerHTML =
+            (aiResult.empathyScore ?? 0) + "/100";
+
+        document.getElementById("defensivenessScore")
+            .innerHTML =
+            (aiResult.defensivenessScore ?? 0) + "/100";
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        document.getElementById("perception")
+            .innerHTML =
+            "Errore durante l'analisi.";
+
+        document.getElementById("emotion")
+            .innerHTML = "-";
+
+        document.getElementById("need")
+            .innerHTML = "-";
+
+        document.getElementById("suggestion")
+            .innerHTML = "-";
+    }
+
+}
+
+</script>
+
+</body>
+</html>
