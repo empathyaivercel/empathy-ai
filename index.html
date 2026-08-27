@@ -1,58 +1,85 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>EMPATHY AI</title>
 
 <style>
+
 body{
-font-family:Arial,sans-serif;
-background:#f4f7fb;
-padding:30px;
+    font-family:Arial,sans-serif;
+    background:#f4f7fb;
+    padding:30px;
 }
 
 .container{
-max-width:800px;
-margin:auto;
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 0 15px rgba(0,0,0,.1);
+    max-width:800px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,0,0,.1);
 }
 
 h1{
-color:#2563eb;
+    color:#2563eb;
 }
 
-select,textarea{
-width:100%;
-padding:12px;
-margin-top:8px;
-margin-bottom:15px;
-border:1px solid #ccc;
-border-radius:8px;
+label{
+    display:block;
+    margin-top:15px;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    margin-bottom:15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+textarea{
+    min-height:120px;
 }
 
 button{
-width:100%;
-padding:15px;
-background:#2563eb;
-color:white;
-border:none;
-border-radius:8px;
-font-size:16px;
-cursor:pointer;
+    width:100%;
+    padding:15px;
+    background:#2563eb;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
 }
 
 .result{
-margin-top:20px;
-padding:20px;
-background:#eef4ff;
-border-radius:10px;
-display:none;
+    margin-top:20px;
+    padding:20px;
+    background:#eef4ff;
+    border-radius:10px;
+    display:none;
 }
+
+.score{
+    font-size:20px;
+    font-weight:bold;
+    color:#2563eb;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -66,109 +93,7 @@ display:none;
 <label>Destinatario</label>
 
 <select id="target">
-<option>Partner</option>
-<option>Mamma</option>
-<option>Papà</option>
-<option>Capo</option>
-<option>Amico</option>
-</select>
-
-<label>Messaggio</label>
-
-<textarea id="message"
-placeholder="Scrivi qui il tuo messaggio"></textarea>
-
-<button onclick="analyzeMessage()">
-Analizza
-</button>
-
-<div id="result" class="result">
-
-<h3>Come verrà percepito</h3>
-<p id="perception"></p>
-
-<h3>Emozione trasmessa</h3>
-<p id="emotion"></p>
-
-<h3>Bisogno nascosto</h3>
-<p id="need"></p>
-
-<h3>Versione consigliata</h3>
-<p id="suggestion"></p>
-
-<h3>Rischio conflitto</h3>
-<p id="conflictScore"></p>
-
-<h3>Livello empatia</h3>
-<p id="empathyScore"></p>
-
-<h3>Probabilità risposta difensiva</h3>
-<p id="defensivenessScore"></p>
-``
-</div>
-
-</div>
-
-<script>
-
-async function analyzeMessage() {
-
-  const target =
-    document.getElementById("target").value;
-
-  const message =
-    document.getElementById("message").value;
-
-  document.getElementById("result").style.display = "block";
-
-  document.getElementById("perception").innerHTML =
-    "Analisi in corso...";
-
-  try {
-
-    const response = await fetch(
-      "/api/analyze",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          target,
-          message
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    const aiResult =
-      JSON.parse(data.result);
-
-    document.getElementById("perception").innerHTML =
-      aiResult.perception;
-
-    document.getElementById("emotion").innerHTML =
-      aiResult.emotion;
-
-    document.getElementById("need").innerHTML =
-      aiResult.need;
-
-    document.getElementById("suggestion").innerHTML =
-      aiResult.suggestion;
-
-  } catch (error) {
-
-    document.getElementById("perception").innerHTML =
-      "Errore durante l'analisi";
-
-    console.error(error);
-
-  }
-}
-
-
-</script>
-
-</body>
-</html>
+    <option>Partner</option>
+    <option>Mamma</option>
+    <option>Papà</option>
+    <option
