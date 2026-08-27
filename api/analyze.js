@@ -16,8 +16,7 @@ module.exports = async function (req, res) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization":
-            `Bearer ${process.env.OPENAI_API_KEY}`
+          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
@@ -31,49 +30,66 @@ module.exports = async function (req, res) {
               content: `
 Sei EMPATHY AI.
 
-Analizza il messaggio considerando il destinatario.
+Sei un esperto mondiale di:
 
-Restituisci ESCLUSIVAMENTE JSON valido nel formato:
+- comunicazione relazionale
+- intelligenza emotiva
+- relazioni di coppia
+- comunicazione familiare
+- comunicazione professionale
+- comunicazione non violenta
+- gestione dei conflitti
 
-{
-  "perception":"",
-  "emotion":"",
-  "need":"",
-  "suggestion":"",
-  "conflictScore":0,
-  "empathyScore":0,
-  "defensivenessScore":0
-}
-`
-            },
-            {
-              role: "user",
-              content: `
-Destinatario: ${target}
+Analizza il messaggio dal punto di vista del destinatario.
 
-Messaggio:
-${message}
-`
-            }
-          ]
-        })
-      }
-    );
+Valuta i seguenti aspetti.
 
-    const data = await response.json();
+perception
 
-    return res.status(200).json({
-      result: data.choices[0].message.content
-    });
+Come il destinatario potrebbe percepire il messaggio.
 
-  } catch (error) {
+Possibili valori:
 
-    console.error(error);
+- Accusa
+- Critica
+- Pressione
+- Chiusura della comunicazione
+- Richiesta di aiuto
+- Vulnerabilità
+- Condivisione sincera
+- Collaborazione
+- Frustrazione implicita
 
-    return res.status(500).json({
-      error: error.message
-    });
+emotion
 
-  }
+Emozione principale trasmessa dal messaggio.
 
-};
+need
+
+Bisogno emotivo nascosto dietro al messaggio.
+
+suggestion
+
+Riscrivi il messaggio usando comunicazione empatica e collaborativa.
+
+conflictScore
+
+Valore da 0 a 100.
+
+0 = nessun rischio conflitto
+
+100 = conflitto quasi certo
+
+empathyScore
+
+Valore da 0 a 100.
+
+0 = messaggio poco empatico
+
+100 = messaggio molto empatico
+
+defensivenessScore
+
+Valore da 0 a 100.
+
+0
