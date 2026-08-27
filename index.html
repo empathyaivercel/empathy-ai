@@ -102,88 +102,61 @@ Analizza
 
 <script>
 
-function analyzeMessage(){
+async function analyzeMessage() {
 
-let msg =
-document.getElementById("message")
-.value.toLowerCase();
+  const target =
+    document.getElementById("target").value;
 
-let perception =
-"Osservazione neutra";
+  const message =
+    document.getElementById("message").value;
 
-let emotion =
-"Neutra";
+  document.getElementById("result").style.display = "block";
 
-let need =
-"Comunicare in modo chiaro";
+  document.getElementById("perception").innerHTML =
+    "Analisi in corso...";
 
-let suggestion =
-"Il messaggio appare già abbastanza chiaro.";
+  try {
 
+    const response = await fetch(
+      "/api/analyze",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          target,
+          message
+        })
+      }
+    );
 
-if(msg.includes("sempre") ||
-msg.includes("mai")){
+    const data = await response.json();
 
-perception =
-"Accusa";
+    const aiResult =
+      JSON.parse(data.result);
 
-emotion =
-"Frustrazione";
+    document.getElementById("perception").innerHTML =
+      aiResult.perception;
 
-need =
-"Sentirmi rispettato e ascoltato";
+    document.getElementById("emotion").innerHTML =
+      aiResult.emotion;
 
-suggestion =
-"Quando accade questo mi sento frustrato. Possiamo parlarne insieme?";
+    document.getElementById("need").innerHTML =
+      aiResult.need;
+
+    document.getElementById("suggestion").innerHTML =
+      aiResult.suggestion;
+
+  } catch (error) {
+
+    document.getElementById("perception").innerHTML =
+      "Errore durante l'analisi";
+
+    console.error(error);
+
+  }
 }
-
-
-if(msg.includes("ritardo")){
-
-perception =
-"Critica";
-
-emotion =
-"Fastidio";
-
-need =
-"Rispetto reciproco";
-
-suggestion =
-"Quando arrivi in ritardo mi sento frustrato perché la puntualità è importante per me. Possiamo organizzarci meglio?";
-}
-
-
-if(msg.includes("non mi ascolti")){
-
-perception =
-"Accusa";
-
-emotion =
-"Delusione";
-
-need =
-"Sentirmi ascoltato";
-
-suggestion =
-"Quando parliamo e non ricevo attenzione mi sento poco ascoltato. Possiamo confrontarci con calma?";
-}
-
-if(msg.includes("fai quello che vuoi")){
-
-perception =
-"Chiusura della comunicazione";
-
-emotion =
-"Rassegnazione";
-
-need =
-"Essere considerato";
-
-suggestion =
-"In questo momento sono deluso dalla situazione. Mi piacerebbe trovare una soluzione insieme.";
-}
-
 document.getElementById("perception").innerHTML =
 perception;
 
