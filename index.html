@@ -2,7 +2,6 @@
 <html lang="it">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -28,12 +27,10 @@ body{
 
 h1{
     color:#2563eb;
-    margin-bottom:10px;
 }
 
 .subtitle{
     color:#666;
-    margin-bottom:25px;
 }
 
 label{
@@ -59,7 +56,7 @@ textarea{
 .button{
     width:100%;
     padding:14px;
-    margin-top:15px;
+    margin-top:10px;
     border:none;
     border-radius:8px;
     font-size:16px;
@@ -84,30 +81,40 @@ textarea{
     background:#15803d;
 }
 
+.secondary{
+    background:#475569;
+    color:white;
+}
+
+.secondary:hover{
+    background:#334155;
+}
+
 .result{
     margin-top:25px;
     padding:25px;
-    background:#eef4ff;
     border-radius:12px;
+    background:#eef4ff;
     display:none;
-}
-
-.score{
-    font-size:22px;
-    font-weight:bold;
-    color:#2563eb;
 }
 
 .section{
     margin-bottom:20px;
 }
 
+.score{
+    font-size:24px;
+    font-weight:bold;
+    color:#2563eb;
+}
+
 .compare-box{
     background:white;
     padding:15px;
+    padding-bottom:5px;
     border-radius:10px;
-    margin-bottom:10px;
     border-left:4px solid #2563eb;
+    margin-bottom:10px;
 }
 
 .loading{
@@ -120,11 +127,10 @@ ul{
 }
 
 li{
-    margin-bottom:5px;
+    margin-bottom:6px;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -150,20 +156,26 @@ Prima di inviare, capisci come sarà ricevuto.
 <label>Messaggio</label>
 
 <textarea
-    id="message"
-    placeholder="Scrivi qui il tuo messaggio..."
+id="message"
+placeholder="Scrivi qui il tuo messaggio..."
 ></textarea>
 
 <button
-    class="button primary"
-    onclick="analyzeMessage()">
-    Analizza
+class="button primary"
+onclick="analyzeMessage()">
+Analizza
 </button>
 
 <button
-    class="button success"
-    onclick="applySuggestion()">
-    Migliora il messaggio
+class="button success"
+onclick="applySuggestion()">
+Migliora il messaggio
+</button>
+
+<button
+class="button secondary"
+onclick="copySuggestion()">
+Copia versione migliorata
 </button>
 
 <div id="result" class="result">
@@ -245,9 +257,7 @@ async function analyzeMessage(){
         document.getElementById("message").value;
 
     if(message.trim() === ""){
-
         alert("Inserisci un messaggio");
-
         return;
     }
 
@@ -280,7 +290,6 @@ async function analyzeMessage(){
         const data = await response.json();
 
         if(!data.result){
-
             throw new Error(
                 data.error || "Nessuna risposta AI"
             );
@@ -289,40 +298,31 @@ async function analyzeMessage(){
         const aiResult =
             JSON.parse(data.result);
 
-        document.getElementById("perception")
-            .innerHTML =
+        document.getElementById("perception").innerHTML =
             aiResult.perception || "-";
 
-        document.getElementById("emotion")
-            .innerHTML =
+        document.getElementById("emotion").innerHTML =
             aiResult.emotion || "-";
 
-        document.getElementById("need")
-            .innerHTML =
+        document.getElementById("need").innerHTML =
             aiResult.need || "-";
 
-        document.getElementById("suggestion")
-            .innerHTML =
-            aiResult.suggestion || "-";
-
-        document.getElementById("improvedMessage")
-            .innerHTML =
-            aiResult.suggestion || "-";
-
-        document.getElementById("likelyReaction")
-            .innerHTML =
+        document.getElementById("likelyReaction").innerHTML =
             aiResult.likelyReaction || "-";
 
-        document.getElementById("conflictScore")
-            .innerHTML =
+        document.getElementById("suggestion").innerHTML =
+            aiResult.suggestion || "-";
+
+        document.getElementById("improvedMessage").innerHTML =
+            aiResult.suggestion || "-";
+
+        document.getElementById("conflictScore").innerHTML =
             (aiResult.conflictScore ?? 0) + "/100";
 
-        document.getElementById("empathyScore")
-            .innerHTML =
+        document.getElementById("empathyScore").innerHTML =
             (aiResult.empathyScore ?? 0) + "/100";
 
-        document.getElementById("defensivenessScore")
-            .innerHTML =
+        document.getElementById("defensivenessScore").innerHTML =
             (aiResult.defensivenessScore ?? 0) + "/100";
 
         const redFlags =
@@ -348,13 +348,8 @@ async function analyzeMessage(){
 
         } else {
 
-            const li =
-                document.createElement("li");
-
-            li.textContent =
-                "Nessun elemento critico rilevato";
-
-            redFlags.appendChild(li);
+            redFlags.innerHTML =
+                "<li>Nessun elemento critico rilevato</li>";
 
         }
 
@@ -365,4 +360,68 @@ async function analyzeMessage(){
 
         document.getElementById("perception")
             .innerHTML =
-            "Errore
+            "Errore durante l'analisi";
+
+    }
+
+}
+
+function applySuggestion(){
+
+    const suggestion =
+        document.getElementById("suggestion")
+        .textContent
+        .trim();
+
+    if(
+        !suggestion ||
+        suggestion === "-" ||
+        suggestion === "Errore durante l'analisi"
+    ){
+
+        alert("Esegui prima un'analisi valida.");
+
+        return;
+    }
+
+    document.getElementById("message")
+        .value = suggestion;
+
+    analyzeMessage();
+}
+
+function copySuggestion(){
+
+    const suggestion =
+        document.getElementById("suggestion")
+        .textContent
+        .trim();
+
+    if(
+        !suggestion ||
+        suggestion === "-"
+    ){
+
+        alert(
+            "Nessuna versione migliorata disponibile."
+        );
+
+        return;
+    }
+
+    navigator.clipboard
+        .writeText(suggestion)
+        .then(() => {
+
+            alert(
+                "Versione migliorata copiata negli appunti."
+            );
+
+        });
+
+}
+
+</script>
+
+</body>
+</html>
