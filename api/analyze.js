@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+module.exports = async function (req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -16,7 +16,8 @@ export default async function handler(req, res) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+          "Authorization":
+            `Bearer ${process.env.OPENAI_API_KEY}`
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
@@ -30,56 +31,49 @@ export default async function handler(req, res) {
               content: `
 Sei EMPATHY AI.
 
-Sei un esperto mondiale di:
-
-- comunicazione relazionale
-- intelligenza emotiva
-- comunicazione non violenta
-- gestione dei conflitti
-- relazioni di coppia
-- comunicazione professionale
-
 Analizza il messaggio considerando il destinatario.
 
-Valuta:
+Restituisci ESCLUSIVAMENTE JSON valido nel formato:
 
-1. perception
-Come il destinatario potrebbe percepire il messaggio
+{
+  "perception":"",
+  "emotion":"",
+  "need":"",
+  "suggestion":"",
+  "conflictScore":0,
+  "empathyScore":0,
+  "defensivenessScore":0
+}
+`
+            },
+            {
+              role: "user",
+              content: `
+Destinatario: ${target}
 
-Esempi:
-- Accusa
-- Critica
-- Richiesta di aiuto
-- Chiusura della comunicazione
-- Vulnerabilità
-- Condivisione emotiva
-- Pressione
+Messaggio:
+${message}
+`
+            }
+          ]
+        })
+      }
+    );
 
-2. emotion
-Emozione predominante trasmessa.
+    const data = await response.json();
 
-3. need
-Bisogno nascosto dietro al messaggio.
+    return res.status(200).json({
+      result: data.choices[0].message.content
+    });
 
-4. suggestion
-Riscrittura empatica, chiara e collaborativa.
+  } catch (error) {
 
-5. conflictScore
-Da 0 a 100.
+    console.error(error);
 
-0 = nessun rischio conflitto
-100 = altissimo rischio conflitto
+    return res.status(500).json({
+      error: error.message
+    });
 
-6. empathyScore
+  }
 
-Da 0 a 100.
-
-0 = messaggio poco empatico
-100 = molto empatico
-
-7. defensivenessScore
-
-Da 0 a 100.
-
-0 = bassa probabilità di risposta difensiva
-100 =
+};
