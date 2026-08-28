@@ -179,6 +179,32 @@ Prima di inviare, capisci come sarà ricevuto.
 
 </select>
 
+<label>Tono della risposta</label>
+
+<select id="tone">
+
+    <option value="warm">
+        ❤️ Affettuoso
+    </option>
+
+    <option value="friendly">
+        😊 Amichevole
+    </option>
+
+    <option value="professional">
+        💼 Professionale
+    </option>
+
+    <option value="diplomatic">
+        🤝 Diplomatico
+    </option>
+
+    <option value="light">
+        😄 Leggero
+    </option>
+
+</select>
+
 <label>Messaggio</label>
 
 <textarea
@@ -325,18 +351,17 @@ Copia versione migliorata
 
 <script>
 
-async function analyzeMessage(){
-
-    alert("analyzeMessage avviata");
-
-    const target =
         document.getElementById("target").value;
 
     const mode =
-        document.getElementById("mode").value;
+    document.getElementById("mode").value;
+
+    const tone =
+    document.getElementById("tone").value;
 
     const message =
-        document.getElementById("message").value;
+    document.getElementById("message").value;
+
 
     if(message.trim() === ""){
         alert("Inserisci un messaggio");
@@ -362,10 +387,11 @@ async function analyzeMessage(){
                     "Content-Type":"application/json"
                 },
                 body: JSON.stringify({
-                    target,
-                    mode,
-                    message
-                })
+        target,
+        mode,
+        tone,
+        message
+        })
             }
         );
 
@@ -435,6 +461,14 @@ try {
 
         document.getElementById("defensivenessScore").textContent =
             (aiResult.defensivenessScore ?? 0) + "/100";
+
+        document.getElementById("careScore")
+        .textContent =
+        (aiResult.careScore ?? 0) + "/100";
+
+        document.getElementById("clarityScore")
+        .textContent =
+        (aiResult.clarityScore ?? 0) + "/100";
 
         const redFlags =
             document.getElementById("redFlags");
