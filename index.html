@@ -356,8 +356,25 @@ async function analyzeMessage(){
             );
         }
 
-        const aiResult =
-            JSON.parse(data.result);
+    console.log("RESULT", data.result);
+
+let aiResult;
+
+try {
+
+    aiResult = JSON.parse(data.result);
+
+} catch(e) {
+
+    document.getElementById("perception")
+        .textContent =
+        "Risposta ricevuta ma non in formato JSON";
+
+        console.log("RAW RESPONSE:");
+        console.log(data.result);
+
+        return;
+        }
 
         document.getElementById("perception").textContent =
             aiResult.perception || "-";
@@ -492,10 +509,8 @@ function useReply(option){
         text &&
         text !== "-"
     ){
-
         document.getElementById("message")
             .value = text;
-
     }
 
 }
