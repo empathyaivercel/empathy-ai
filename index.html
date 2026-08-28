@@ -307,42 +307,152 @@ Copia versione migliorata
 
 async function analyzeMessage(){
 
-    const target =
-        document.getElementById("target").value;
+const target =
+document.getElementById("target").value;
 
-    const message =
-        document.getElementById("message").value;
+const mode =
+document.getElementById("mode").value;
 
-    if(message.trim() === ""){
-        alert("Inserisci un messaggio");
-        return;
-    }
+const message =
+document.getElementById("message").value;
 
-    document.getElementById("result")
-        .style.display = "block";
+if(message.trim() === ""){
+alert("Inserisci un messaggio");
+return;
+}
 
-    document.getElementById("originalMessage")
-        .innerHTML = message;
+document.getElementById("result")
+.style.display = "block";
 
-    document.getElementById("perception")
-    .innerHTML =
-    "Errore: " + error.message;
+document.getElementById("originalMessage")
+.textContent = message;
 
-    try{
+document.getElementById("perception")
+.innerHTML =
+"<span class='loading'>Analisi in corso...</span>";
 
-        const response = await fetch(
-            "/api/analyze",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    target,
-                    message
-                })
-            }
-        );
+try{
+
+const response = await fetch(
+"/api/analyze",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+target,
+mode,
+message
+})
+}
+);
+
+const data = await response.json();
+
+if(!data.result){
+
+throw new Error(
+data.error || "Nessuna risposta AI"
+);
+
+}
+
+const aiResult =
+JSON.parse(data.result);
+
+document.getElementById("perception")
+.textContent =
+aiResult.perception || "-";
+
+document.getElementById("emotion")
+.textContent =
+aiResult.emotion || "-";
+
+document.getElementById("need")
+.textContent =
+aiResult.need || "-";
+
+document.getElementById("likelyReaction")
+.textContent =
+aiResult.likelyReaction || "-";
+
+document.getElementById("suggestion")
+.textContent =
+aiResult.suggestion || "-";
+
+document.getElementById("improvedMessage")
+.textContent =
+aiResult.suggestion || "-";
+
+document.getElementById("replyOption1")
+.textContent =
+aiResult.replyOptions?.[0] || "-";
+
+document.getElementById("replyOption2")
+.textContent =
+aiResult.replyOptions?.[1] || "-";
+
+document.getElementById("replyOption3")
+.textContent =
+aiResult.replyOptions?.[2] || "-";
+
+document.getElementById("bestReply")
+.textContent =
+aiResult.bestReply || "-";
+
+document.getElementById("conflictScore")
+.textContent =
+(aiResult.conflictScore ?? 0) + "/100";
+
+document.getElementById("empathyScore")
+.textContent =
+(aiResult.empathyScore ?? 0) + "/100";
+
+document.getElementById("defensivenessScore")
+.textContent =
+(aiResult.defensivenessScore ?? 0) + "/100";
+
+const redFlags =
+document.getElementById("redFlags");
+
+redFlags.innerHTML = "";
+
+if(
+aiResult.redFlags &&
+aiResult.redFlags.length > 0
+){
+
+aiResult.redFlags.forEach(flag => {
+
+const li =
+document.createElement("li");
+
+li.textContent = flag;
+
+redFlags.appendChild(li);
+
+});
+
+} else {
+
+redFlags.innerHTML =
+"<li>Nessun elemento critico rilevato</li>";
+
+}
+
+}
+catch(error){
+
+console.error(error);
+
+document.getElementById("perception")
+.textContent =
+"Errore: " + error.message;
+
+}
+
+}
 
         const data = await response.json();
 
