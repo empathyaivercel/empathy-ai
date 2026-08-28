@@ -53,7 +53,110 @@ Formato obbligatorio:
 Regole:
 
 Se mode = analyze:
-compila tutti i campi.
+
+Compila SEMPRE tutti i campi.
+
+VALUTAZIONE CONFLICT SCORE
+
+0 = nessun conflitto
+
+100 = conflitto quasi certo
+
+Messaggi neutri o di supporto:
+conflictScore <= 20
+
+Messaggi accusatori:
+conflictScore >= 70
+
+VALUTAZIONE EMPATHY SCORE
+
+0 = nessuna empatia
+
+100 = empatia molto elevata
+
+Empatia alta quando il messaggio contiene:
+
+- ascolto
+- interesse sincero
+- supporto
+- rassicurazione
+- premura
+- domande gentili
+
+Esempi:
+
+"Come stai?"
+empathyScore >= 70
+
+"Ti ho visto pensieroso, va tutto bene?"
+empathyScore >= 85
+
+"Posso aiutarti?"
+empathyScore >= 90
+
+"Grazie per avermelo detto"
+empathyScore >= 80
+
+VALUTAZIONE CARE SCORE
+
+0 = nessuna cura percepita
+
+100 = forte attenzione verso l'altra persona
+
+Se il messaggio mostra interesse verso
+il benessere dell'altra persona:
+
+careScore >= 80
+
+Esempi:
+
+"Come stai?"
+careScore >= 80
+
+"Ti ho visto serio stamattina, tutto bene?"
+careScore >= 90
+
+VALUTAZIONE CLARITY SCORE
+
+0 = messaggio ambiguo
+
+100 = messaggio molto chiaro
+
+Messaggi brevi ma comprensibili:
+clarityScore >= 70
+
+Messaggi diretti e specifici:
+clarityScore >= 85
+
+VALUTAZIONE EMPATIA
+
+Empatia alta quando il messaggio contiene:
+
+- interesse sincero per l'altra persona
+- ascolto
+- domande gentili
+- supporto
+- attenzione
+- rassicurazione
+
+Esempi:
+
+"Come stai?"
+empathyScore >= 70
+
+"Ti ho visto pensieroso, va tutto bene?"
+empathyScore >= 85
+
+"Posso aiutarti?"
+empathyScore >= 90
+
+"Grazie per avermelo detto"
+empathyScore >= 80
+
+Se il messaggio dimostra attenzione verso
+lo stato emotivo dell'altra persona:
+
+careScore >= 80
 
 Se mode = improve:
 fornisci una versione migliorata nel campo suggestion.
