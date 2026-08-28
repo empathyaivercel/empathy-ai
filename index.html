@@ -325,8 +325,8 @@ async function analyzeMessage(){
         .innerHTML = message;
 
     document.getElementById("perception")
-        .innerHTML =
-        "<span class='loading'>Analisi in corso...</span>";
+    .innerHTML =
+    "Errore: " + error.message;
 
     try{
 
