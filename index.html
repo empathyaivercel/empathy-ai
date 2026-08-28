@@ -348,191 +348,6 @@ message
 }
 );
 
-const data = await response.json();
-
-if(!data.result){
-
-throw new Error(
-data.error || "Nessuna risposta AI"
-);
-
-}
-
-const aiResult =
-JSON.parse(data.result);
-
-document.getElementById("perception")
-.textContent =
-aiResult.perception || "-";
-
-document.getElementById("emotion")
-.textContent =
-aiResult.emotion || "-";
-
-document.getElementById("need")
-.textContent =
-aiResult.need || "-";
-
-document.getElementById("likelyReaction")
-.textContent =
-aiResult.likelyReaction || "-";
-
-document.getElementById("suggestion")
-.textContent =
-aiResult.suggestion || "-";
-
-document.getElementById("improvedMessage")
-.textContent =
-aiResult.suggestion || "-";
-
-document.getElementById("replyOption1")
-.textContent =
-aiResult.replyOptions?.[0] || "-";
-
-document.getElementById("replyOption2")
-.textContent =
-aiResult.replyOptions?.[1] || "-";
-
-document.getElementById("replyOption3")
-.textContent =
-aiResult.replyOptions?.[2] || "-";
-
-document.getElementById("bestReply")
-.textContent =
-aiResult.bestReply || "-";
-
-document.getElementById("conflictScore")
-.textContent =
-(aiResult.conflictScore ?? 0) + "/100";
-
-document.getElementById("empathyScore")
-.textContent =
-(aiResult.empathyScore ?? 0) + "/100";
-
-document.getElementById("defensivenessScore")
-.textContent =
-(aiResult.defensivenessScore ?? 0) + "/100";
-
-const redFlags =
-document.getElementById("redFlags");
-
-redFlags.innerHTML = "";
-
-if(
-aiResult.redFlags &&
-aiResult.redFlags.length > 0
-){
-
-aiResult.redFlags.forEach(flag => {
-
-const li =
-document.createElement("li");
-
-li.textContent = flag;
-
-redFlags.appendChild(li);
-
-});
-
-} else {
-
-redFlags.innerHTML =
-"<li>Nessun elemento critico rilevato</li>";
-
-}
-
-}
-catch(error){
-
-console.error(error);
-
-document.getElementById("perception")
-.textContent =
-"Errore: " + error.message;
-
-}
-
-}
-
-        const data = await response.json();
-
-        if(!data.result){
-            throw new Error(
-                data.error || "Nessuna risposta AI"
-            );
-        }
-
-        const aiResult =
-            JSON.parse(data.result);
-
-        document.getElementById("perception").innerHTML =
-            aiResult.perception || "-";
-
-        document.getElementById("emotion").innerHTML =
-            aiResult.emotion || "-";
-
-        document.getElementById("need").innerHTML =
-            aiResult.need || "-";
-
-        document.getElementById("likelyReaction").innerHTML =
-            aiResult.likelyReaction || "-";
-
-        document.getElementById("suggestion").innerHTML =
-            aiResult.suggestion || "-";
-
-        document.getElementById("improvedMessage").innerHTML =
-            aiResult.suggestion || "-";
-
-        document.getElementById("conflictScore").innerHTML =
-            (aiResult.conflictScore ?? 0) + "/100";
-
-        document.getElementById("empathyScore").innerHTML =
-            (aiResult.empathyScore ?? 0) + "/100";
-
-        document.getElementById("defensivenessScore").innerHTML =
-            (aiResult.defensivenessScore ?? 0) + "/100";
-
-        const redFlags =
-            document.getElementById("redFlags");
-
-        redFlags.innerHTML = "";
-
-        if(
-            aiResult.redFlags &&
-            aiResult.redFlags.length > 0
-        ){
-
-            aiResult.redFlags.forEach(flag => {
-
-                const li =
-                    document.createElement("li");
-
-                li.textContent = flag;
-
-                redFlags.appendChild(li);
-
-            });
-
-        } else {
-
-            redFlags.innerHTML =
-                "<li>Nessun elemento critico rilevato</li>";
-
-        }
-
-    }
-    catch(error){
-
-        console.error(error);
-
-        document.getElementById("perception")
-            .innerHTML =
-            "Errore durante l'analisi";
-
-    }
-
-}
-
 function applySuggestion(){
 
     const suggestion =
@@ -585,6 +400,25 @@ function copySuggestion(){
             );
 
         });
+
+}
+
+function useReply(option){
+
+    const text =
+        document.getElementById(
+            "replyOption" + option
+        ).textContent;
+
+    if(
+        text &&
+        text !== "-"
+    ){
+
+        document.getElementById("message")
+            .value = text;
+
+    }
 
 }
 
