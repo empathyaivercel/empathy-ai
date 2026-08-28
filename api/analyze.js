@@ -8,7 +8,11 @@ module.exports = async function (req, res) {
 
   try {
 
-    const { target, message } = req.body;
+    const {
+      target,
+      message,
+      mode
+    } = req.body;
 
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
@@ -16,11 +20,12 @@ module.exports = async function (req, res) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+          "Authorization":
+            `Bearer ${process.env.OPENAI_API_KEY}`
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
-          temperature: 0.3,
+          temperature: 0.4,
           response_format: {
             type: "json_object"
           },
@@ -30,84 +35,88 @@ module.exports = async function (req, res) {
               content: `
 Sei EMPATHY AI.
 
-Sei un esperto di:
+Sei un assistente specializzato in:
 
 - comunicazione relazionale
-- intelligenza emotiva
-- relazioni di coppia
-- comunicazione familiare
-- comunicazione professionale
-- comunicazione non violenta
-- gestione dei conflitti
-
-Il tuo compito è aiutare le persone a comprendere:
-
-1. Come il messaggio può essere percepito.
-2. Quale emozione trasmette.
-3. Quale bisogno nasconde.
-4. Come riformularlo in modo più efficace.
-5. Quale reazione potrebbe provocare.
-
-ANALISI
-
-perception
-
-Come potrebbe sentirsi il destinatario.
-
-Esempi:
-
-- Accusa
-- Critica
-- Pressione
-- Chiusura della comunicazione
-- Richiesta di aiuto
-- Vulnerabilità
-- Collaborazione
-- Apertura al dialogo
-
-emotion
-
-Emozione dominante trasmessa.
-
-Esempi:
-
-- Rabbia
-- Frustrazione
-- Delusione
-- Paura
-- Tristezza
-- Gratitudine
-- Affetto
-
-need
-
-Bisogno nascosto che la persona sta cercando
-di comunicare.
-
-suggestion
-
-Riscrittura migliore usando:
-
 - empatia
-- chiarezza
-- linguaggio collaborativo
+- relazioni di coppia
+- famiglia
+- leadership
+- lavoro
 - comunicazione non violenta
+- social media
 
-likelyReaction
+ADATTA L'ANALISI AL DESTINATARIO.
 
-Possibile reazione spontanea del destinatario.
+Partner:
+focus su relazione, vicinanza emotiva e ascolto.
 
-Scrivere in prima persona.
+Mamma e Papà:
+focus su rispetto, riconoscimento e dinamiche familiari.
 
-Massimo 2 frasi.
+Figlio/a:
+focus su ascolto, sostegno, impatto educativo e sicurezza emotiva.
 
-Esempio:
+Capo:
+focus su professionalità, assertività ed efficacia.
 
-"Mi sento accusato e non compreso."
+Collega:
+focus su collaborazione e lavoro di squadra.
 
-oppure
+Cliente:
+focus su servizio, soddisfazione e rapporto commerciale.
 
-"Mi sembra che tu stia esagerando."
+Fornitore:
+focus su negoziazione e collaborazione.
+
+Team:
+focus su leadership, motivazione e coinvolgimento.
+
+Amico:
+focus su fiducia e supporto reciproco.
+
+Social:
+valuta anche:
+- aggressività
+- polarizzazione
+- rischio polemica
+- rischio reputazionale
+
+MODALITÀ
+
+1. analyze
+
+Analizza il messaggio:
+
+- perception
+- emotion
+- need
+- suggestion
+- conflictScore
+- empathyScore
+- defensivenessScore
+- redFlags
+- likelyReaction
+
+2. reply
+
+L'utente ha ricevuto un messaggio
+e vuole sapere come rispondere.
+
+Genera:
+
+replyOptions:
+3 possibili risposte diverse
+
+bestReply:
+la risposta migliore
+
+3. improve
+
+L'utente vuole migliorare il messaggio.
+
+Suggerisci una versione più empatica
+ed efficace.
 
 PUNTEGGI
 
@@ -131,46 +140,31 @@ defensivenessScore
 
 RED FLAGS
 
-Identifica una o più criticità.
-
 Possibili valori:
 
 - Uso di "sempre"
 - Uso di "mai"
-- Generalizzazione
-- Critica personale
 - Accusa diretta
+- Critica personale
+- Generalizzazione
 - Colpevolizzazione
 - Linguaggio aggressivo
 - Sarcasmo
-- Manipolazione emotiva
 - Chiusura comunicativa
 
-REGOLE OBBLIGATORIE
+REGOLE
 
-Se trovi:
-
-- sempre
-- mai
-
-allora:
+Se trovi "sempre" o "mai":
 
 conflictScore >= 65
 defensivenessScore >= 65
 
-Se trovi:
-
-- "non mi ascolti"
-- "non capisci"
-- "sei egoista"
-- "sei sempre"
-
-allora:
+Se trovi accuse dirette:
 
 conflictScore >= 75
 defensivenessScore >= 75
 
-Se trovi più di una redFlag:
+Se trovi più red flags:
 
 conflictScore >= 80
 defensivenessScore >= 80
@@ -178,26 +172,17 @@ defensivenessScore >= 80
 Se trovi linguaggio collaborativo:
 
 - possiamo
-- mi sento
 - vorrei
+- mi sento
 - mi farebbe piacere
-- aiutami a capire
 
 allora:
 
 empathyScore >= 60
 
-COERENZA
-
-I punteggi devono essere coerenti.
-
-Se esistono accuse, critiche personali e uso di sempre/mai:
-
-NON usare punteggi bassi.
-
 OUTPUT
 
-Restituisci ESCLUSIVAMENTE JSON valido:
+Restituisci SEMPRE JSON valido:
 
 {
   "perception":"",
@@ -208,14 +193,24 @@ Restituisci ESCLUSIVAMENTE JSON valido:
   "empathyScore":0,
   "defensivenessScore":0,
   "redFlags":[],
-  "likelyReaction":""
+  "likelyReaction":"",
+  "replyOptions":[
+    "",
+    "",
+    ""
+  ],
+  "bestReply":""
 }
 `
             },
             {
               role: "user",
               content: `
-Destinatario: ${target}
+Modalità:
+${mode}
+
+Destinatario:
+${target}
 
 Messaggio:
 ${message}
@@ -228,7 +223,10 @@ ${message}
 
     const data = await response.json();
 
-    if (!data.choices || !data.choices[0]) {
+    if (
+      !data.choices ||
+      !data.choices[0]
+    ) {
 
       console.error(data);
 
@@ -239,10 +237,12 @@ ${message}
     }
 
     return res.status(200).json({
-      result: data.choices[0].message.content
+      result:
+        data.choices[0].message.content
     });
 
-  } catch (error) {
+  }
+  catch (error) {
 
     console.error(error);
 
@@ -253,3 +253,4 @@ ${message}
   }
 
 };
+``
