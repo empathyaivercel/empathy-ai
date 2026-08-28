@@ -338,7 +338,7 @@ async function analyzeMessage(){
     try{
 
         const response = await fetch(
-            "/api/analyze",
+  "https://api.openai.com/v1/chat/completions",
             {
                 method:"POST",
                 headers:{
