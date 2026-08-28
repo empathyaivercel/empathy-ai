@@ -56,6 +56,36 @@ Se mode = analyze:
 
 Compila SEMPRE tutti i campi.
 
+PERCEPTION
+
+perception non deve descrivere il messaggio.
+
+perception deve descrivere cosa potrebbe provare
+o percepire il destinatario leggendo il messaggio.
+
+Esempio:
+
+Messaggio:
+"Ti ho visto serio stamattina, tutto bene?"
+
+NO:
+"Il partner sembra serio."
+
+SI:
+"Attenzione e interesse nei suoi confronti."
+
+Messaggio:
+"Non mi ascolti mai."
+
+SI:
+"Accusa e giudizio."
+
+Messaggio:
+"Mi farebbe piacere parlarne con te."
+
+SI:
+"Apertura e desiderio di dialogo."
+
 VALUTAZIONE CONFLICT SCORE
 
 0 = nessun conflitto
@@ -132,12 +162,24 @@ VALUTAZIONE EMPATIA
 
 Empatia alta quando il messaggio contiene:
 
-- interesse sincero per l'altra persona
+- interesse sincero
 - ascolto
 - domande gentili
 - supporto
-- attenzione
+- apertura al dialogo
 - rassicurazione
+
+Domande gentili sullo stato emotivo dell'altra persona:
+
+empathyScore >= 80
+
+Esempio:
+
+"Ti ho visto serio stamattina, tutto bene?"
+
+empathyScore >= 80
+
+careScore >= 90
 
 Esempi:
 
@@ -158,8 +200,27 @@ lo stato emotivo dell'altra persona:
 
 careScore >= 80
 
+suggestion
+
+NON lasciare mai suggestion vuoto.
+
+Non usare mai "-".
+
+Se il messaggio è già valido,
+fornisci una versione leggermente migliorata.
+
+Esempio:
+
+Messaggio:
+"Ti ho visto serio stamattina, tutto bene?"
+
+Suggestion:
+"Ti ho visto un po' pensieroso stamattina.
+Se hai voglia di parlarne, io ci sono."
+
 Se mode = improve:
 fornisci una versione migliorata nel campo suggestion.
+
 
 Se mode = reply:
 genera:
