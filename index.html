@@ -235,19 +235,18 @@ Copia versione migliorata
 
 <h3>Possibili risposte</h3>
 
-<div class="compare-box">
-<strong>Opzione 1</strong>
-<p id="replyOption1"></p>
-</div>
+<div class="compare-box"
+onclick="useReply(1)"
+style="cursor:pointer">
 
-<div class="compare-box">
-<strong>Opzione 2</strong>
-<p id="replyOption2"></p>
-</div>
+<div class="compare-box"
+onclick="useReply(2)"
+style="cursor:pointer">
 
-<div class="compare-box">
-<strong>Opzione 3</strong>
-<p id="replyOption3"></p>
+<div class="compare-box"
+     onclick="useReply(3)"
+     style="cursor:pointer">
+
 </div>
 
 </div>
@@ -307,46 +306,136 @@ Copia versione migliorata
 
 async function analyzeMessage(){
 
-const target =
-document.getElementById("target").value;
+    alert("analyzeMessage avviata");
 
-const mode =
-document.getElementById("mode").value;
+    const target =
+        document.getElementById("target").value;
 
-const message =
-document.getElementById("message").value;
+    const mode =
+        document.getElementById("mode").value;
 
-if(message.trim() === ""){
-alert("Inserisci un messaggio");
-return;
+    const message =
+        document.getElementById("message").value;
+
+    if(message.trim() === ""){
+        alert("Inserisci un messaggio");
+        return;
+    }
+
+    document.getElementById("result")
+        .style.display = "block";
+
+    document.getElementById("originalMessage")
+        .textContent = message;
+
+    document.getElementById("perception").textContent =
+        "Analisi in corso...";
+
+    try{
+
+        const response = await fetch(
+            "/api/analyze",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    target,
+                    mode,
+                    message
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if(!data.result){
+            throw new Error(
+                data.error || "Nessuna risposta AI"
+            );
+        }
+
+        const aiResult =
+            JSON.parse(data.result);
+
+        document.getElementById("perception").textContent =
+            aiResult.perception || "-";
+
+        document.getElementById("emotion").textContent =
+            aiResult.emotion || "-";
+
+        document.getElementById("need").textContent =
+            aiResult.need || "-";
+
+        document.getElementById("likelyReaction").textContent =
+            aiResult.likelyReaction || "-";
+
+        document.getElementById("suggestion").textContent =
+            aiResult.suggestion || "-";
+
+        document.getElementById("improvedMessage").textContent =
+            aiResult.suggestion || "-";
+
+        document.getElementById("replyOption1").textContent =
+            aiResult.replyOptions?.[0] || "-";
+
+        document.getElementById("replyOption2").textContent =
+            aiResult.replyOptions?.[1] || "-";
+
+        document.getElementById("replyOption3").textContent =
+            aiResult.replyOptions?.[2] || "-";
+
+        document.getElementById("bestReply").textContent =
+            aiResult.bestReply || "-";
+
+        document.getElementById("conflictScore").textContent =
+            (aiResult.conflictScore ?? 0) + "/100";
+
+        document.getElementById("empathyScore").textContent =
+            (aiResult.empathyScore ?? 0) + "/100";
+
+        document.getElementById("defensivenessScore").textContent =
+            (aiResult.defensivenessScore ?? 0) + "/100";
+
+        const redFlags =
+            document.getElementById("redFlags");
+
+        redFlags.innerHTML = "";
+
+        if (
+            aiResult.redFlags &&
+            aiResult.redFlags.length > 0
+        ) {
+
+            aiResult.redFlags.forEach(flag => {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent = flag;
+
+                redFlags.appendChild(li);
+
+            });
+
+        } else {
+
+            redFlags.innerHTML =
+                "<li>Nessun elemento critico rilevato</li>";
+
+        }
+
+    } catch(error){
+
+        console.error(error);
+
+        document.getElementById("perception").textContent =
+            "Errore: " + error.message;
+
+    }
+
 }
-
-document.getElementById("result")
-.style.display = "block";
-
-document.getElementById("originalMessage")
-.textContent = message;
-
-document.getElementById("perception")
-.innerHTML =
-"<span class='loading'>Analisi in corso...</span>";
-
-try{
-
-const response = await fetch(
-"/api/analyze",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-target,
-mode,
-message
-})
-}
-);
 
 function applySuggestion(){
 
@@ -357,19 +446,17 @@ function applySuggestion(){
 
     if(
         !suggestion ||
-        suggestion === "-" ||
-        suggestion === "Errore durante l'analisi"
+        suggestion === "-"
     ){
-
-        alert("Esegui prima un'analisi valida.");
-
+        alert("Esegui prima un'analisi.");
         return;
     }
 
-    document.getElementById("message")
-        .value = suggestion;
+document.getElementById("message")
+    .value = suggestion;
 
-    analyzeMessage();
+analyzeMessage();
+
 }
 
 function copySuggestion(){
@@ -383,24 +470,15 @@ function copySuggestion(){
         !suggestion ||
         suggestion === "-"
     ){
-
-        alert(
-            "Nessuna versione migliorata disponibile."
-        );
-
+        alert("Nessuna versione disponibile.");
         return;
     }
 
-    navigator.clipboard
-        .writeText(suggestion)
-        .then(() => {
+    navigator.clipboard.writeText(
+        suggestion
+    );
 
-            alert(
-                "Versione migliorata copiata negli appunti."
-            );
-
-        });
-
+    alert("Versione copiata.");
 }
 
 function useReply(option){
@@ -414,10 +492,8 @@ function useReply(option){
         text &&
         text !== "-"
     ){
-
         document.getElementById("message")
             .value = text;
-
     }
 
 }
