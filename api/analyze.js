@@ -1,278 +1,502 @@
-module.exports = async function (req, res) {
+<!DOCTYPE html>
+<html lang="it">
 
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Metodo non consentito"
-    });
-  }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  try {
+<title>❤️ EMPATHY AI</title>
 
-    const {
-      target,
-      message,
-      mode
-    } = req.body;
+<style>
 
-    const response = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          temperature: 0.4,
-          response_format: {
-            type: "json_object"
-          },
-          messages: [
-            {
-              role: "system",
-              content: `
-Sei EMPATHY AI.
-
-Sei un assistente esperto di:
-
-- comunicazione relazionale
-- relazioni di coppia
-- famiglia
-- crescita personale
-- empatia
-- leadership
-- comunicazione professionale
-- comunicazione non violenta
-
-ADATTA SEMPRE LE RISPOSTE AL DESTINATARIO.
-
-DESTINATARI
-
-Partner:
-focalizzati su ascolto, relazione e vicinanza emotiva.
-
-Mamma e Papà:
-focalizzati su rispetto, riconoscimento e dinamiche familiari.
-
-Figlio/a:
-focalizzati su sicurezza emotiva, ascolto e sostegno.
-
-Capo:
-focalizzati su professionalità, chiarezza e risultati.
-
-Collega:
-focalizzati su collaborazione e lavoro di squadra.
-
-Cliente:
-focalizzati su servizio e soddisfazione.
-
-Fornitore:
-focalizzati su negoziazione e collaborazione.
-
-Team:
-focalizzati su leadership e coinvolgimento.
-
-Amico:
-focalizzati su fiducia e supporto reciproco.
-
-Social:
-considera:
-- rischio polemica
-- aggressività
-- polarizzazione
-- rischio reputazionale
-
---------------------------------------------------
-
-MODALITA ANALYZE
-
-Analizza il messaggio e restituisci:
-
-- perception
-- emotion
-- need
-- suggestion
-- conflictScore
-- empathyScore
-- defensivenessScore
-- redFlags
-- likelyReaction
-
---------------------------------------------------
-
-MODALITA REPLY
-
-L'utente ha ricevuto un messaggio.
-
-Genera SEMPRE:
-
-replyOptions:
-3 risposte complete e diverse.
-
-Opzione 1:
-rassicurante
-
-Opzione 2:
-empatica
-
-Opzione 3:
-leggera o amichevole
-
-bestReply:
-la risposta migliore.
-
---------------------------------------------------
-
-MODALITA IMPROVE
-
-L'utente vuole migliorare il proprio messaggio.
-
-Genera una versione:
-
-- più empatica
-- più collaborativa
-- più efficace
-- più chiara
-
---------------------------------------------------
-
-PUNTEGGI
-
-conflictScore
-
-0 = nessun rischio conflitto
-
-100 = conflitto quasi certo
-
-empathyScore
-
-0 = empatia molto bassa
-
-100 = empatia molto alta
-
-defensivenessScore
-
-0 = risposta difensiva improbabile
-
-100 = risposta difensiva quasi certa
-
---------------------------------------------------
-
-RED FLAGS
-
-Possibili valori:
-
-- Uso di "sempre"
-- Uso di "mai"
-- Generalizzazione
-- Critica personale
-- Accusa diretta
-- Colpevolizzazione
-- Linguaggio aggressivo
-- Sarcasmo
-- Chiusura comunicativa
-
---------------------------------------------------
-
-REGOLE
-
-Se trovi "sempre" o "mai":
-
-conflictScore >= 65
-defensivenessScore >= 65
-
-Se trovi accuse dirette:
-
-conflictScore >= 75
-defensivenessScore >= 75
-
-Se trovi più red flags:
-
-conflictScore >= 80
-defensivenessScore >= 80
-
-Se trovi linguaggio collaborativo:
-
-- possiamo
-- mi sento
-- vorrei
-- mi farebbe piacere
-
-allora:
-
-empathyScore >= 60
-
---------------------------------------------------
-
-OUTPUT
-
-Restituisci SEMPRE JSON valido.
-
-{
-  "perception":"",
-  "emotion":"",
-  "need":"",
-  "suggestion":"",
-  "conflictScore":0,
-  "empathyScore":0,
-  "defensivenessScore":0,
-  "redFlags":[],
-  "likelyReaction":"",
-  "replyOptions":[
-    "",
-    "",
-    ""
-  ],
-  "bestReply":""
+body{
+    font-family:Arial,sans-serif;
+    background:#f4f7fb;
+    margin:0;
+    padding:30px;
 }
-`
-            },
-            {
-              role: "user",
-              content: `
-Modalità:
-${mode}
 
-Destinatario:
-${target}
+.container{
+    max-width:1000px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 0 20px rgba(0,0,0,.1);
+}
 
-Messaggio:
-${message}
-`
-            }
-          ]
-        })
-      }
-    );
+h1{
+    color:#2563eb;
+}
 
-    const data = await response.json();
+.subtitle{
+    color:#666;
+}
 
-    if (
-      !data.choices ||
-      !data.choices[0] ||
-      !data.choices[0].message
-    ) {
+label{
+    display:block;
+    margin-top:15px;
+    margin-bottom:8px;
+    font-weight:bold;
+}
 
-      console.error(data);
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+}
 
-      return res.status(500).json({
-        error: "Risposta OpenAI non valida"
-      });
+textarea{
+    min-height:140px;
+}
+
+.button{
+    width:100%;
+    padding:14px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.primary{
+    background:#2563eb;
+    color:white;
+}
+
+.primary:hover{
+    background:#1d4ed8;
+}
+
+.success{
+    background:#16a34a;
+    color:white;
+}
+
+.success:hover{
+    background:#15803d;
+}
+
+.secondary{
+    background:#475569;
+    color:white;
+}
+
+.secondary:hover{
+    background:#334155;
+}
+
+.result{
+    margin-top:25px;
+    padding:25px;
+    border-radius:12px;
+    background:#eef4ff;
+    display:none;
+}
+
+.section{
+    margin-bottom:20px;
+}
+
+.score{
+    font-size:24px;
+    font-weight:bold;
+    color:#2563eb;
+}
+
+.compare-box{
+    background:white;
+    padding:15px;
+    padding-bottom:5px;
+    border-radius:10px;
+    border-left:4px solid #2563eb;
+    margin-bottom:10px;
+}
+
+.loading{
+    color:#2563eb;
+    font-weight:bold;
+}
+
+ul{
+    padding-left:20px;
+}
+
+li{
+    margin-bottom:6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>❤️ EMPATHY AI</h1>
+
+<p class="subtitle">
+Prima di inviare, capisci come sarà ricevuto.
+</p>
+
+<label>Destinatario</label>
+
+<select id="target">
+
+    <option>❤️ Partner</option>
+    <option>👩 Mamma</option>
+    <option>👨 Papà</option>
+    <option>👧 Figlio/a</option>
+    <option>💼 Capo</option>
+    <option>👔 Collega</option>
+    <option>🤝 Cliente</option>
+    <option>🏭 Fornitore</option>
+    <option>🚀 Team</option>
+    <option>👥 Amico</option>
+    <option>🌐 Social</option>
+
+</select>
+
+<label>Modalità</label>
+
+<select id="mode">
+
+    <option value="analyze">
+        ❤️ Analizza un messaggio
+    </option>
+
+    <option value="reply">
+        💬 Aiutami a rispondere
+    </option>
+
+    <option value="improve">
+        ✍️ Migliora il mio messaggio
+    </option>
+
+</select>
+
+<label>Messaggio</label>
+
+<textarea
+id="message"
+placeholder="Scrivi qui il tuo messaggio..."
+></textarea>
+
+<button
+class="button primary"
+onclick="analyzeMessage()">
+Analizza
+</button>
+
+<button
+class="button success"
+onclick="applySuggestion()">
+Migliora il messaggio
+</button>
+
+<button
+class="button secondary"
+onclick="copySuggestion()">
+Copia versione migliorata
+</button>
+
+<div id="result" class="result">
+
+<div class="section">
+<h3>Cosa potrebbe sentire il destinatario</h3>
+<p id="perception"></p>
+</div>
+
+<div class="section">
+<h3>Emozione trasmessa</h3>
+<p id="emotion"></p>
+</div>
+
+<div class="section">
+<h3>Cosa stai cercando di comunicare davvero</h3>
+<p id="need"></p>
+</div>
+
+<div class="section">
+<h3>Come potrebbe rispondere il destinatario</h3>
+<p id="likelyReaction"></p>
+</div>
+
+<div class="section">
+<h3>Versione consigliata</h3>
+<p id="suggestion"></p>
+</div>
+
+<div class="section">
+
+<h3>Possibili risposte</h3>
+
+<div class="compare-box"
+onclick="useReply(1)"
+style="cursor:pointer">
+
+<div class="compare-box"
+onclick="useReply(2)"
+style="cursor:pointer">
+
+<div class="compare-box"
+     onclick="useReply(3)"
+     style="cursor:pointer">
+
+</div>
+
+</div>
+
+<div class="section">
+
+<h3>Risposta consigliata</h3>
+
+<div class="compare-box">
+<p id="bestReply"></p>
+</div>
+
+</div>
+    
+<div class="section">
+
+<h3>Confronto Prima / Dopo</h3>
+
+<div class="compare-box">
+<strong>Messaggio originale</strong>
+<p id="originalMessage"></p>
+</div>
+
+<div class="compare-box">
+<strong>Messaggio migliorato</strong>
+<p id="improvedMessage"></p>
+</div>
+
+</div>
+
+<div class="section">
+
+<h3>Rischio conflitto</h3>
+<p id="conflictScore" class="score"></p>
+
+<h3>Livello empatia</h3>
+<p id="empathyScore" class="score"></p>
+
+<h3>Probabilità risposta difensiva</h3>
+<p id="defensivenessScore" class="score"></p>
+
+</div>
+
+<div class="section">
+
+<h3>Elementi critici rilevati</h3>
+
+<ul id="redFlags"></ul>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+async function analyzeMessage(){
+
+    const target =
+        document.getElementById("target").value;
+
+    const mode =
+        document.getElementById("mode").value;
+
+    const message =
+        document.getElementById("message").value;
+
+    if(message.trim() === ""){
+        alert("Inserisci un messaggio");
+        return;
     }
 
-    return res.status(200).json({
-      result: data.choices[0].message.content
-    });
+    document.getElementById("result")
+        .style.display = "block";
 
-  } catch (error) {
+    document.getElementById("originalMessage")
+        .textContent = message;
 
-    console.error(error);
+    document.getElementById("perception").textContent =
+        "Analisi in corso...";
 
-    return res.status(500).json({
-      error: error.message
-    });
+    try{
 
-  }
+        const response = await fetch(
+            "/api/analyze",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    target,
+                    mode,
+                    message
+                })
+            }
+        );
 
-};
+        const data = await response.json();
+
+        if(!data.result){
+            throw new Error(
+                data.error || "Nessuna risposta AI"
+            );
+        }
+
+        const aiResult =
+            JSON.parse(data.result);
+
+        document.getElementById("perception").textContent =
+            aiResult.perception || "-";
+
+        document.getElementById("emotion").textContent =
+            aiResult.emotion || "-";
+
+        document.getElementById("need").textContent =
+            aiResult.need || "-";
+
+        document.getElementById("likelyReaction").textContent =
+            aiResult.likelyReaction || "-";
+
+        document.getElementById("suggestion").textContent =
+            aiResult.suggestion || "-";
+
+        document.getElementById("improvedMessage").textContent =
+            aiResult.suggestion || "-";
+
+        document.getElementById("replyOption1").textContent =
+            aiResult.replyOptions?.[0] || "-";
+
+        document.getElementById("replyOption2").textContent =
+            aiResult.replyOptions?.[1] || "-";
+
+        document.getElementById("replyOption3").textContent =
+            aiResult.replyOptions?.[2] || "-";
+
+        document.getElementById("bestReply").textContent =
+            aiResult.bestReply || "-";
+
+        document.getElementById("conflictScore").textContent =
+            (aiResult.conflictScore ?? 0) + "/100";
+
+        document.getElementById("empathyScore").textContent =
+            (aiResult.empathyScore ?? 0) + "/100";
+
+        document.getElementById("defensivenessScore").textContent =
+            (aiResult.defensivenessScore ?? 0) + "/100";
+
+        const redFlags =
+            document.getElementById("redFlags");
+
+        redFlags.innerHTML = "";
+
+        if (
+            aiResult.redFlags &&
+            aiResult.redFlags.length > 0
+        ) {
+
+            aiResult.redFlags.forEach(flag => {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent = flag;
+
+                redFlags.appendChild(li);
+
+            });
+
+        } else {
+
+            redFlags.innerHTML =
+                "<li>Nessun elemento critico rilevato</li>";
+
+        }
+
+    } catch(error){
+
+        console.error(error);
+
+        document.getElementById("perception").textContent =
+            "Errore: " + error.message;
+
+    }
+
+}
+
+function applySuggestion(){
+
+    const suggestion =
+        document.getElementById("suggestion")
+        .textContent
+        .trim();
+
+    if(
+        !suggestion ||
+        suggestion === "-"
+    ){
+        alert("Esegui prima un'analisi.");
+        return;
+    }
+
+document.getElementById("message")
+    .value = suggestion;
+
+analyzeMessage();
+
+}
+
+function copySuggestion(){
+
+    const suggestion =
+        document.getElementById("suggestion")
+        .textContent
+        .trim();
+
+    if(
+        !suggestion ||
+        suggestion === "-"
+    ){
+        alert("Nessuna versione disponibile.");
+        return;
+    }
+
+    navigator.clipboard.writeText(
+        suggestion
+    );
+
+    alert("Versione copiata.");
+}
+
+function useReply(option){
+
+    const text =
+        document.getElementById(
+            "replyOption" + option
+        ).textContent;
+
+    if(
+        text &&
+        text !== "-"
+    ){
+        document.getElementById("message")
+            .value = text;
+    }
+
+}
+
+</script>
+
+</body>
+</html>
