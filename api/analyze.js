@@ -38,6 +38,8 @@ Formato obbligatorio:
   "conflictScore":0,
   "empathyScore":0,
   "defensivenessScore":0,
+  "careScore":0,
+  "clarityScore":0,
   "redFlags":[],
   "likelyReaction":"",
   "replyOptions":[
